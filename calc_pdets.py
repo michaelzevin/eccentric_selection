@@ -55,7 +55,6 @@ for ifo in args.ifos:
 
 
 ### Calculate optimal matched-filter SNRs and detection probabilities for all systems
-data = data.head(200)
 pdet_data = np.asarray(data[['m1','m2','spin1','spin2','dL','e_10Hz']])
 
 func = partial(eccentric_selection_utils.detection_probability_eccentric, psd_path=args.psdpath, ifos=ifos_dict, snr_thresh=args.snr_thresh, Ntrials=args.Ntrials, aligned_spin=False, flow=args.flow)
