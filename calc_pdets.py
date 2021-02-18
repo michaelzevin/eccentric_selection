@@ -64,7 +64,7 @@ pool = multiprocessing.Pool(args.num_cores)
 start=time.time()
 results = pool.map(func, pdet_data)
 end=time.time()
-print(end-start)
+print("Detection probability calculations took {:0.3} seconds".format(end-start))
 
 
 ### Add results to population dataframe
