@@ -39,12 +39,13 @@ data['cosmo_weight'] = cosmo.differential_comoving_volume(data['z_mergers']) * (
 
 
 ### Calculate eccentricities at each frequency
-for flow in args.freqs:
-    print('Calculating eccentricities at frequency of {} Hz...'.format(flow))
+for fLow in args.freqs:
+    print('Calculating eccentricities at frequency of {} Hz...'.format(fLow))
+    fLow = float(fLow)
 
     system_data = np.asarray(data[['m1','m2','a_final(AU)','e_final']])
 
-    func = partial(gw_inspiral.eccentricity_at_ref_freq, f_gw=flow, e_ref=0.999, R_peri=False)
+    func = partial(gw_inspiral.eccentricity_at_ref_freq, f_gw=fLow, e_ref=0.999, R_peri=False)
     pool = multiprocessing.Pool(args.num_cores)
 
     start=time.time()
@@ -52,7 +53,7 @@ for flow in args.freqs:
     end=time.time()
     print("   eccentricity calculations took {:0.3} seconds\n".format(end-start))
 
-    ecc_key = 'e_'+str(int(flow))+'Hz'
+    ecc_key = 'e_'+str(int(fLow))+'Hz'
     data[ecc_key] = np.asarray(results)
 
 

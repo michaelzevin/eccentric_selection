@@ -8,6 +8,18 @@ from scipy.optimize import brentq
 Functions for integrating binary inspirals and calculating eccentricities
 """
 
+def au_to_period(a,m):
+    """
+    Returns the period (in days) for a binary
+    with mass m (solar masses) and semi-major axis a (AU)
+    """
+    g = 2.96e-4 # G in days,AU,solar masses
+    return np.sqrt(a**3 * 4*np.pi**2 / (g*m))
+
+def deda_peters(a,e):
+    num = 12*a*(1+(73./24)*e**2 + (37./96)*e**4)
+    denom = 19*e*(1-e**2)*(1+(121./304)*e**2)
+    return denom/num
 
 def calc_c0(a0,e0):
     num = a0*(1-e0**2)
@@ -162,30 +174,35 @@ def eccentricity_at_eccentric_fLow(m1,m2,a_0,e_0,fLow=10,retHigh = False):
         a_low = brentq(zero_eq,1e-10,1)
         return ecc_at_a(a_low)
 
-def eccentricity_at_ref_freq(m1, m2, a0, e0, f_gw=10, e_ref=0.999, R_peri=False):
+def eccentricity_at_ref_freq(system, f_gw=10, e_ref=0.999, R_peri=False):
 
     """
     Main function for calculating eccentricities at a given gravitational-wave frequency
     """
 
+    m1 = system[0]
+    m2 = system[1]
+    a0 = system[2]
+    e0 = system[3]
+
     # calculate c0
-    c0 = peters.calc_c0(a0, e0)
+    c0 = calc_c0(a0, e0)
     # calculate what the periapse distance was at reference high eccentricity
-    r_peri_high_e = peters.Rperi_at_eccentricity(a0,e0,e_ref)
+    r_peri_high_e = Rperi_at_eccentricity(a0,e0,e_ref)
     # calculate eccentricity and inspiral times in various ways
-    a_low = peters.a_at_fLow(m1, m2, fLow=f_gw/2)
+    a_low = a_at_fLow(m1, m2, fLow=f_gw)
 
     if R_peri==False:
         ### METHOD FOR ECCENTRICITY CALCULATION: Wen 2003 ###
-        ef = peters.eccentricity_at_eccentric_fLow(m1,m2,a0,e0, fLow=f_gw, retHigh=True)
+        ef = eccentricity_at_eccentric_fLow(m1,m2,a0,e0, fLow=f_gw, retHigh=True)
 
     else:
         ### METHOD FOR ECCENTRICITY CALCULATION: USING Rperi ###
         # if r_peri at high e is less than a_low, then the binary formed in band
         if r_peri_high_e <= a_low:
-            ef = peters.eccentricity_at_eccentric_fLow(m1, m2, a_low, e_ref, fLow=f_gw, retHigh=False)
+            ef = eccentricity_at_eccentric_fLow(m1, m2, a_low, e_ref, fLow=f_gw, retHigh=False)
         else:
             # bianry evolved into the LIGO band
-            ef = peters.eccentricity_at_eccentric_fLow(m1, m2, a0, e0, fLow=f_gw, retHigh=False)
-            
+            ef = eccentricity_at_eccentric_fLow(m1, m2, a0, e0, fLow=f_gw, retHigh=False)
+
     return ef
