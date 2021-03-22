@@ -31,8 +31,8 @@ data = pd.read_hdf(args.datapath, key='bbh')
 data = data.loc[~data['z_mergers'].isna()]
 
 # get luminosity and comoving distance of mergers (Gpc)
-data['luminosity_distance'] = cosmo.luminosity_distance(data['z_mergers']).to(u.Gpc).value
-data['comoving_distance'] = cosmo.comoving_distance(data['z_mergers']).to(u.Gpc).value
+data['luminosity_distance'] = cosmo.luminosity_distance(data['z_mergers']).to(u.Mpc).value
+data['comoving_distance'] = cosmo.comoving_distance(data['z_mergers']).to(u.Mpc).value
 
 # get cosmological weights
 data['cosmo_weight'] = cosmo.differential_comoving_volume(data['z_mergers']) * (1+data['z_mergers'])**(-1)
