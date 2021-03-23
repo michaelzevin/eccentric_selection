@@ -509,7 +509,7 @@ def detection_probability_eccentric(system, psd_path, ifos={"H1":"midhighlatelow
     
     snr_opts={}
     chi2_snr={}
-    for ifo in ifos.keys():
+    for idx, ifo in enumerate(ifos.keys()):
         rho2 = optimal_snr_squared(sf, freqs, psds[ifo])
         snr_opts[ifo] = np.sqrt(rho2).real
         if idx==0:
