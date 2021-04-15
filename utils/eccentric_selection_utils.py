@@ -48,7 +48,7 @@ def inverse_fourier_transform(hf,n,dt):
     hc = np.fft.irfft(-hcf, n) / dt
     return hp, hc
 
-def gen_eccentric_waveform(M1, M2, Chi1, Chi2, Deff, e0, Iota=np.pi/2, modes=[[2,2]], phase=0.0, f0=10, srate=4096):
+def gen_eccentric_waveform(M1, M2, Chi1, Chi2, Deff, e0, Iota=0.0, modes=[[2,2]], phase=0.0, f0=10, srate=4096):
     """
     Generates (time-domain) eccentric waveform using TEOBResumS
     
