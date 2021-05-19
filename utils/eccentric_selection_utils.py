@@ -402,7 +402,7 @@ def maximize_time_phase(sf, hf, freqs, psd_interp, time_limit_dt=1e-3, return_ti
     time_limit = time_limit_dt * duration
     phase_limit = np.pi / 2
     timeShift_guess = 0
-    phaseShift_guess = 0
+    """phaseShift_guess = 0
     
     x0 = [timeShift_guess, phaseShift_guess]
     bounds = [(timeShift_guess-time_limit, timeShift_guess+time_limit),\
@@ -412,7 +412,26 @@ def maximize_time_phase(sf, hf, freqs, psd_interp, time_limit_dt=1e-3, return_ti
     # minimize overlap
     res = minimize(maximize_overlap_optimizable, bounds=bounds, x0=x0, args=args, tol=1e-10, method='Powell')
     timeShift, phaseShift = res.x[0], res.x[1]
-    maximum_overlap = -res.fun
+    maximum_overlap = -res.fun"""
+
+    # try a bunch of different initial guesses
+    phaseShift_guesses = np.linspace(-phase_limit, phase_limit, 10)
+    res_list = []
+    for phaseShift_guess in phaseShift_guesses:
+        x0 = [timeShift_guess, phaseShift_guess]
+        bounds = [(timeShift_guess-time_limit, timeShift_guess+time_limit),\
+                  (-np.pi/2, np.pi/2)]
+        args = (sf, hf, freqs, psd_interp)
+
+        # minimize overlap
+        res = minimize(maximize_overlap_optimizable, bounds=bounds, x0=x0, args=args, tol=1e-10, method='Powell')
+        res_list.append(res)
+        
+    max_overlaps = [-r.fun for r in res_list]
+    
+    res = res_list[np.argmax(max_overlaps)]
+    timeShift, phaseShift = res.x[0], res.x[1]
+    maximum_overlap = -res.fun  
     
     # shift template according to this timeshift and phaseshift
     hf_shift = apply_phaseshift(hf, phaseShift)
@@ -483,8 +502,9 @@ def detection_probability_eccentric(system, psd_path, ifos={"H1":"midhighlatelow
     assert dt==ts[1]-ts[0], "Sampling rate is different between the circular and eccentric waveforms!"
     
     # window waveforms
-    th, h = window_waveform(th, h)
-    ts, s = window_waveform(ts, s)
+    alpha_pad = kwargs["alpha_pad"] if "alpha_pad" in kwargs else 0.1
+    th, h = window_waveform(th, h, alpha=alpha_pad)
+    ts, s = window_waveform(ts, s, alpha=alpha_pad)
     
     # zero-pad and align waveforms
     s, h, ts, th, shift = zero_pad_and_align_maxima(s, h, ts, th)
