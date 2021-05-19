@@ -415,7 +415,7 @@ def maximize_time_phase(sf, hf, freqs, psd_interp, time_limit_dt=1e-3, return_ti
     maximum_overlap = -res.fun"""
 
     # try a bunch of different initial guesses
-    phaseShift_guesses = np.linspace(-phase_limit, phase_limit, 10)
+    phaseShift_guesses = np.linspace(-phase_limit, phase_limit, 5)
     res_list = []
     for phaseShift_guess in phaseShift_guesses:
         x0 = [timeShift_guess, phaseShift_guess]
